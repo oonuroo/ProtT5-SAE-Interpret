@@ -1,6 +1,6 @@
 # Interpreting Disordered Proteins Using Sparse Autoencoders and Protein Language Models 🧬
 
-This repository contains code and documentation for interpreting **disordered proteins** using **Sparse Autoencoders (SAEs)** on embeddings from the **ProtT5** protein language model (pLM). Inspired by *From Mechanistic Interpretability to Mechanistic Biology* ([bioRxiv](https://www.biorxiv.org/content/10.1101/2024.08.27.609883v1)), it adapts the architecture from [etowahadams/interprot](https://github.com/etowahadams/interprot) to extract and visualize latent features of disordered proteins.
+This repository contains code and documentation for interpreting **disordered proteins** using **Sparse Autoencoders (SAEs)** on embeddings from the **ProtT5** protein language model (pLM). Inspired by *From Mechanistic Interpretability to Mechanistic Biology* ([bioRxiv](https://www.biorxiv.org/content/10.1101/2024.08.27.609883v1)), it modifies and adapts the architecture from [etowahadams/interprot](https://github.com/etowahadams/interprot). 
 
 ## Project Aim 🎯
 The goal is to:
