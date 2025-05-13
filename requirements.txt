@@ -1,0 +1,39 @@
+# Core machine learning and model handling
+torch==2.5.1+cu121  # PyTorch for ProtT5 and SAE training
+transformers==4.51.3  # Hugging Face Transformers for ProtT5 model
+pytorch-lightning==2.5.1.post0  # Training loops and early stopping for SAE
+torchmetrics==1.7.1  # Metrics for SAE evaluation
+h5py==3.13.0  # HDF5 file handling for embeddings
+safetensors==0.5.3  # Safe model weight loading
+tokenizers==0.21.1  # Tokenization for ProtT5
+sentencepiece==0.2.0  # Additional tokenization support
+
+# Data processing and analysis
+numpy==2.1.2  # Numerical computations
+pandas==2.2.3  # Data manipulation and EDA
+biopython==1.85  # FASTA file processing
+scikit-learn==1.6.1  # Data splitting and grid search
+scipy==1.15.2  # Statistical analysis
+requests==2.32.3  # API calls for MobiDB and UniProt
+polars==1.29.0  # High-performance DataFrame processing
+narwhals==1.36.0  # DataFrame compatibility layer
+MobiDB-lite==4.0.0  # Parsing MobiDB data
+regex==2024.11.6  # Regular expressions for data parsing
+
+# Visualization and experiment tracking
+matplotlib==3.10.1  # Plotting for EDA
+seaborn==0.13.2  # Enhanced visualizations
+wandb==0.19.10  # Experiment tracking for grid search
+plotly==6.0.1  # Interactive plots for EDA
+
+# Jupyter for interactive analysis
+jupyter==1.0.0  # Jupyter notebooks for EDA
+ipykernel==6.29.5  # Jupyter kernel
+ipywidgets==8.1.6  # Interactive widgets
+
+# Utilities
+tqdm==4.67.1  # Progress bars for embedding extraction
+joblib==1.4.2  # Parallelization for grid search
+pyyaml==6.0.2  # Configuration files
+filelock==3.13.1  # File locking for safe saving
+packaging==25.0  # Dependency management
