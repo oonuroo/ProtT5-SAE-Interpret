@@ -90,17 +90,17 @@ Tracked performance using Weights & Biases (WandB) and also saved results in CSV
 - Additional properties (e.g., aggregation, phosphorylation) to be sourced from PASTA3 and Scop3P.
 
 ##### Properties of Interest:
-- 1. Disorder regions (curated and homology-based from MobiDB).
+1. Disorder regions (curated and homology-based from MobiDB).
 
-- 2. Phase separation (curated and homology-based).
+2. Phase separation (curated and homology-based).
 
-- 3. Fold-upon-binding regions (filtered for regions ≥10 residues).
+3. Fold-upon-binding regions (filtered for regions ≥10 residues).
 
-- 4. Subcellular localization (multi-label classification from MobiDB JSON).
+4. Subcellular localization (multi-label classification from MobiDB JSON).
 
-- 5. Signal peptides and transmembrane regions (UniProt).
+5. Signal peptides and transmembrane regions (UniProt).
 
-- 6. Secondary structure, aggregation, and phosphorylation (to be implemented).
+6. Secondary structure, aggregation, and phosphorylation (to be implemented).
 
 
 
