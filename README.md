@@ -4,15 +4,15 @@ This repository contains the code and documentation for a project aimed at inter
 
 ### Project Aim
 The project focuses on:
--- Developing a Sparse Autoencoder (SAE) tailored for the ProtT5 language model to capture latent features of disordered proteins.
+- Developing a Sparse Autoencoder (SAE) tailored for the ProtT5 language model to capture latent features of disordered proteins.
 
--- Constructing datasets for protein properties (e.g., disorder regions, phase separation, subcellular localization) from sources like MobiDB, UniProt, and PDB.
+- Constructing datasets for protein properties (e.g., disorder regions, phase separation, subcellular localization) from sources like MobiDB, UniProt, and PDB.
 
--- Probing SAE neurons to identify sequence positions associated with specific protein properties.
+- Probing SAE neurons to identify sequence positions associated with specific protein properties.
 
--- Visualizing these features to understand how ProtT5 encodes disordered protein characteristics.
+- Visualizing these features to understand how ProtT5 encodes disordered protein characteristics.
 
--- Integrating the pipeline into the FELLS web server for broader accessibility.
+- Integrating the pipeline into the FELLS web server for broader accessibility.
 
 
 
