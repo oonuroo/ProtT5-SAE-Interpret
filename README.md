@@ -73,26 +73,34 @@ The goal is to:
 
 ## Repository Structure
 
-├── src/                            
-  ├── data-preparation/            
-      ├── clean_sequences.py                          # Cleaning dataset by adding spaces between aminoacids, replace rare aminoacids with x
-      ├── cleaned_gridsearch.py                       # Gridsearch with cleaned sequences
-      ├── data_discovery.ipynb                        # Embeddings and dataset EDA
-  ├── model-save/                         
-      ├── get_model.py                                # Downloading and saving model (aprx 5GB)
-  ├── sae/                                            # Preprocessing, embedding extraction, SAE training
-      ├── prot_t5_wrapper.py                          # Extract embeddings
-      ├── data_module.py                              # Preparing test,train and validation datasets
-      ├── sae_model.py                                # Initialization of SAE
-      ├── sae_module.py                               # SAE model, optimizer setup, train and validations steps, early syopping (avg_mse_loss)
-      ├── test_hyper_grid_search.py                   # Test grid search with smaller set
-      ├── hyper_grid_search.py                        # Grid search
-      ├── grid_search_summarize_results.py            # Saving grid search results into csv file
-      ├── extract_sae_activations.py                  # Extracting sae activations
-      ├── extract_top_latents.py                      # Extracting the top latents
-      ├── training.py                                 # Training the SAE, saving the results 
-  ├── utils/                   
-      ├── utils.py                                    # Helper functions (train_val_test_split) 
+├── src/
+│   ├── data-preparation/
+│   │   ├── clean_sequences.py              # Clean dataset (add spaces, replace rare amino acids with 'X')
+│   │   ├── cleaned_gridsearch.py           # Grid search for cleaned sequences
+│   │   ├── data_discovery.ipynb            # EDA for embeddings and dataset
+│   ├── model-save/
+│   │   ├── get_model.py                   # Download and save ProtT5 model (~5 GB)
+│   ├── sae/
+│   │   ├── prot_t5_wrapper.py             # Extract ProtT5 embeddings
+│   │   ├── data_module.py                 # Prepare train, validation, test datasets
+│   │   ├── sae_model.py                   # Initialize SAE
+│   │   ├── sae_module.py                  # SAE model setup, training, validation, early stopping
+│   │   ├── test_hyper_grid_search.py      # Test grid search with smaller dataset
+│   │   ├── hyper_grid_search.py           # Full grid search
+│   │   ├── grid_search_summarize_results.py # Save grid search results to CSV
+│   │   ├── extract_sae_activations.py     # Extract SAE neuron activations
+│   │   ├── extract_top_latents.py         # Identify top latent features
+│   │   ├── training.py                    # Train SAE and save results
+│   ├── utils/
+│   │   ├── utils.py                       # Helper functions (e.g., train-val-test split)
+├── data/                   # Raw and preprocessed datasets
+├── embeddings/             # ProtT5 embeddings (layer_16.h5, layer_24.h5)
+├── models/                 # Trained SAE models
+├── logs/                   # Extraction and training logs
+├── results/                # Grid search results (CSV, WandB)
+├── docs/                   # Pipeline diagram, additional docs
 └── README.md               # Project overview
+
+
 
 
