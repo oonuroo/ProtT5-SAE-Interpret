@@ -15,6 +15,22 @@ The project focuses on:
 - Integrating the pipeline into the FELLS web server for broader accessibility.
 
 
+### Dataset
+Source: A dataset of 280,589 protein sequences in FASTA format.
+
+Preprocessing:
+- Verified uniqueness of protein IDs.
+
+Conducted exploratory data analysis (EDA) to compute:
+- Minimum, maximum, average, and median sequence lengths.
+
+Distribution of amino acid sequence lengths.
+
+Modified sequences for ProtT5 compatibility:
+- Inserted whitespaces between amino acids.
+
+Replaced rare amino acids (U, Z, O, B) with 'X'.
+
 
 
 
