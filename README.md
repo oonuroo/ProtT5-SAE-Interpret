@@ -72,36 +72,27 @@ The goal is to:
 - Integrate into FELLS for interactive visualization.
 
 ## Repository Structure
+
+```plaintext
 ├── src/
 │   ├── data-preparation/
-│   │   ├── clean_sequences.py              # Clean dataset (add spaces, replace rare amino acids with 'X')
-│   │   ├── cleaned_gridsearch.py           # Grid search for cleaned sequences
-│   │   ├── data_discovery.ipynb            # EDA for embeddings and dataset
+│   │   ├── clean_sequences.py                   # Clean dataset (add spaces, replace rare amino acids with 'X')
+│   │   ├── cleaned_gridsearch.py                # Grid search for cleaned sequences
+│   │   ├── data_discovery.ipynb                 # EDA for embeddings and dataset
 │   ├── model-save/
-│   │   ├── get_model.py                   # Download and save ProtT5 model (~5 GB)
+│   │   ├── get_model.py                         # Download and save ProtT5 model (~5 GB)
 │   ├── sae/
-│   │   ├── prot_t5_wrapper.py             # Extract ProtT5 embeddings
-│   │   ├── data_module.py                 # Prepare train, validation, test datasets
-│   │   ├── sae_model.py                   # Initialize SAE
-│   │   ├── sae_module.py                  # SAE model setup, training, validation, early stopping
-│   │   ├── test_hyper_grid_search.py      # Test grid search with smaller dataset
-│   │   ├── hyper_grid_search.py           # Full grid search
-│   │   ├── grid_search_summarize_results.py # Save grid search results to CSV
-│   │   ├── extract_sae_activations.py     # Extract SAE neuron activations
-│   │   ├── extract_top_latents.py         # Identify top latent features
-│   │   ├── training.py                    # Train SAE and save results
+│   │   ├── prot_t5_wrapper.py                   # Extract ProtT5 embeddings
+│   │   ├── data_module.py                       # Prepare train, validation, test datasets
+│   │   ├── sae_model.py                         # Initialize SAE
+│   │   ├── sae_module.py                        # SAE model setup, training, validation, early stopping
+│   │   ├── test_hyper_grid_search.py            # Test grid search with smaller dataset
+│   │   ├── hyper_grid_search.py                 # Full grid search
+│   │   ├── grid_search_summarize_results.py     # Save grid search results to CSV
+│   │   ├── extract_sae_activations.py           # Extract SAE neuron activations
+│   │   ├── extract_top_latents.py               # Identify top latent features
+│   │   ├── training.py                          # Train SAE and save results
 │   ├── utils/
-│   │   ├── utils.py                       # Helper functions (e.g., train-val-test split)
-├── data/                   # Raw and preprocessed datasets
-├── embeddings/             # ProtT5 embeddings (layer_16.h5, layer_24.h5)
-├── models/                 # Trained SAE models
-├── logs/                   # Extraction and training logs
-├── results/                # Grid search results (CSV, WandB)
-├── docs/                   # Pipeline diagram, additional docs
-└── README.md               # Project overview
-
-
-
-
-
-
+│   │   ├── utils.py                             # Helper functions (e.g., train-val-test split)
+└── README.md                                    # Project overview
+```
