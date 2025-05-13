@@ -32,7 +32,7 @@ Modified sequences for ProtT5 compatibility:
 Replaced rare amino acids (U, Z, O, B) with 'X'.
 
 ## Methodology
-### 1.ProtT5 Embeddings Extraction
+### 1. ProtT5 Embeddings Extraction
 Model: Used the ProtT5-XL-Half-UniRef50-Enc model for generating per-residue embeddings.
 
 #### Grid Search for Optimization:
