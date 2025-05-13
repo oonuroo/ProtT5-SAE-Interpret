@@ -38,8 +38,8 @@ The goal is to:
   - Best setup chosen based on runtime.
 - **Extraction**:
   - Per-residue embeddings from:
-    - **Layer 16** (middle): `layer_16.h5` (235 GB).
-    - **Layer 24** (output): `layer_24.h5` (470 GB).
+    - **Layer 16** (middle): `layer_16.h5` (470 GB).
+    - **Layer 24** (output): `layer_24.h5` (235 GB).
   - Total: **707 GB**.
   - Logged sequence IDs to ensure data integrity (no duplications or missing proteins).
 
