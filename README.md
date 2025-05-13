@@ -1,4 +1,23 @@
-# The aim of the project: Interpreting Disordered Proteins using Sparse Auto-Encoders and pLMs
+# Interpreting Disordered Proteins using Sparse Auto-Encoders and pLMs
+
+This repository contains the code and documentation for a project aimed at interpreting disordered proteins by leveraging Sparse Autoencoders (SAEs) on embeddings from the ProtT5 protein language model (pLM). The goal is to extract and visualize features of disordered proteins that are not easily derived from sequence data alone, inspired by the reference paper: From Mechanistic Interpretability to Mechanistic Biology bioRxiv. The codebase adapts and extends the architecture from etowahadams/interprot.
+
+### Project Aim
+The project focuses on:
+-- Developing a Sparse Autoencoder (SAE) tailored for the ProtT5 language model to capture latent features of disordered proteins.
+
+-- Constructing datasets for protein properties (e.g., disorder regions, phase separation, subcellular localization) from sources like MobiDB, UniProt, and PDB.
+
+-- Probing SAE neurons to identify sequence positions associated with specific protein properties.
+
+-- Visualizing these features to understand how ProtT5 encodes disordered protein characteristics.
+
+-- Integrating the pipeline into the FELLS web server for broader accessibility.
+
+
+
+
+
 ### Steps have been taken:
 - Given the dataset contains 280.589 sequences from different cells from different cells, in fasta format file.  
 - Explatory data analysis on the  dataset which to see if all protein id`s are uniques, the min-max-avg-median lengths of the datasets, distribution of the lengths of aminoacids.   
