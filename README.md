@@ -31,6 +31,90 @@ Modified sequences for ProtT5 compatibility:
 
 Replaced rare amino acids (U, Z, O, B) with 'X'.
 
+### Methodology
+1. ProtT5 Embeddings Extraction
+Model: Used the ProtT5-XL-Half-UniRef50-Enc model for generating per-residue embeddings.
+
+Grid Search for Optimization:
+Sampled 1,000 random proteins to optimize embedding extraction.
+
+Parameters tested:
+Queue sizes: [50, 100, 500]
+
+Batch sizes: [25, 50, 100, 250]
+
+Compression methods: [gzip, lzf]
+
+Threading: [True, False]
+
+Total configurations: 48 (3 × 4 × 2 × 2).
+
+Selected the best configuration based on performance metrics (e.g., runtime, memory efficiency).
+
+Embedding Extraction:
+Processed one sequence at a time to extract embeddings from:
+Layer 16 (middle layer): Saved as layer_16.h5 (235 GB).
+
+Layer 24 (output layer): Saved as layer_24.h5 (470 GB).
+
+Total storage: 707 GB.
+
+Maintained a log file with sequence IDs to track extraction, detect duplications, and identify missing proteins by cross-referencing protein IDs.
+
+2. Sparse Autoencoder (SAE) Implementation
+Architecture: Adapted the SAE architecture from etowahadams/interprot to suit ProtT5 embeddings.
+
+Grid Search for SAE Training:
+Used 2,000 sequences to optimize SAE hyperparameters.
+
+Parameters tested:
+Sparsity (k): [16, 32, 64, 128, 256]
+
+Hidden dimensions (d_hidden): [2048, 4096, 8192, 16384]
+
+Layers: [16, 24]
+
+Learning rates: [1e-4, 2e-4, 5e-4]
+
+Total configurations: 120 (5 × 4 × 2 × 3).
+
+Tracked performance using Weights & Biases (WandB) and saved results in CSV files for analysis.
+
+Training: Implemented SAE to learn sparse representations of ProtT5 embeddings, enabling feature extraction for disordered protein properties.
+
+3. Dataset Construction (In Progress)
+Sources:
+MobiDB: Extracted protein properties (e.g., disorder regions, phase separation, compactness) from TSV and JSON formats.
+
+UniProt: Retrieved signal peptides and transmembrane regions via JSON API.
+
+PDB/MobiDB: Planned extraction of secondary structure data from MobiDB’s MongoDB database.
+
+Additional properties (e.g., aggregation, phosphorylation) to be sourced from PASTA3 and Scop3P.
+
+Properties of Interest:
+Disorder regions (curated and homology-based from MobiDB).
+
+Phase separation (curated and homology-based).
+
+Fold-upon-binding regions (filtered for regions ≥10 residues).
+
+Subcellular localization (multi-label classification from MobiDB JSON).
+
+Signal peptides and transmembrane regions (UniProt).
+
+Secondary structure, aggregation, and phosphorylation (to be implemented).
+
+Redundancy Reduction: All datasets will be filtered to ensure ≤25% sequence identity.
+
+4. Probing and Visualization (Planned)
+Probe SAE neurons to identify which fire for specific protein properties.
+
+Map active neurons to sequence positions to visualize regions associated with disordered protein features.
+
+Integrate results into the FELLS web server for interactive visualization.
+
+
 
 
 
