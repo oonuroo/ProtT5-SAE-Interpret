@@ -11,18 +11,18 @@ The goal is to:
 - Integrate the pipeline into the [FELLS web server](https://fells.org/).
 
 ## Dataset 📊
-- **Source**: **280,589 protein sequences** in FASTA format, sourced from [UniProt](https://www.uniprot.org/) with diverse cellular contexts.
+- **Source**: **280,589 protein sequences** in FASTA format with diverse cellular contexts.
 - **Preprocessing**:
-  - Verified unique protein IDs.
+  - Verified uniqueness of protein IDs.
   - Performed exploratory data analysis (EDA):
     - Sequence length stats: min, max, average, median.
     - Amino acid length distribution.
   - Prepared for ProtT5:
     - Added whitespaces between amino acids.
     - Replaced rare amino acids (U, Z, O, B) with 'X'.
-- **Redundancy Reduction**: In progress, targeting ≤25% sequence identity using CD-HIT.
-- **Note**: Large dataset size (707 GB embeddings) required single-sequence processing to manage memory.
-
+- **Notes**:
+    -  Embedding file sizes are  (707 GB)
+    -  One sequence is processed at a time
 ## Methodology ⚙️
 
 ### 1. ProtT5 Embeddings Extraction
@@ -35,7 +35,7 @@ The goal is to:
     - Compression: `[gzip, lzf]`
     - Threading: `[True, False]`
   - Total: **48** configurations (3 × 4 × 2 × 2).
-  - Best setup chosen based on runtime and memory efficiency.
+  - Best setup chosen based on runtime.
 - **Extraction**:
   - Per-residue embeddings from:
     - **Layer 16** (middle): `layer_16.h5` (235 GB).
@@ -72,3 +72,27 @@ The goal is to:
 - Integrate into FELLS for interactive visualization.
 
 ## Repository Structure
+
+├── src/                            
+  ├── data-preparation/            
+      ├── clean_sequences.py                          # Cleaning dataset by adding spaces between aminoacids, replace rare aminoacids with x
+      ├── cleaned_gridsearch.py                       # Gridsearch with cleaned sequences
+      ├── data_discovery.ipynb                        # Embeddings and dataset EDA
+  ├── model-save/                         
+      ├── get_model.py                                # Downloading and saving model (aprx 5GB)
+  ├── sae/                                            # Preprocessing, embedding extraction, SAE training
+      ├── prot_t5_wrapper.py                          # Extract embeddings
+      ├── data_module.py                              # Preparing test,train and validation datasets
+      ├── sae_model.py                                # Initialization of SAE
+      ├── sae_module.py                               # SAE model, optimizer setup, train and validations steps, early syopping (avg_mse_loss)
+      ├── test_hyper_grid_search.py                   # Test grid search with smaller set
+      ├── hyper_grid_search.py                        # Grid search
+      ├── grid_search_summarize_results.py            # Saving grid search results into csv file
+      ├── extract_sae_activations.py                  # Extracting sae activations
+      ├── extract_top_latents.py                      # Extracting the top latents
+      ├── training.py                                 # Training the SAE, saving the results 
+  ├── utils/                   
+      ├── utils.py                                    # Helper functions (train_val_test_split) 
+└── README.md               # Project overview
+
+
