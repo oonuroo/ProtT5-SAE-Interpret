@@ -4,7 +4,7 @@ import json
 import time
 from tqdm import tqdm
 from threading import Thread
-from queue import Queue, Empty  # Import Empty explicitly
+from queue import Queue, Empty
 from concurrent.futures import ThreadPoolExecutor
 
 FASTA_PATH = "/home/onur/Desktop/Project/data/mobidb_silver_clustered_40"
@@ -28,11 +28,14 @@ SUBCLASS_POS2 = {"prediction-extended-mobidb_lite_sub"}
 WRITE_CHUNK_SIZE = 200
 NUM_WORKERS = 4
 
-# Ensure output directories exist
-for path in [DISORDER_OUTPUT_JSON, PHASESEP_OUTPUT_JSON, FOLD_BINDING_OUTPUT_JSON, ELM_OUTPUT_JSON, SUBCLASS_POS1_JSON, SUBCLASS_POS2_JSON]:
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    if os.path.exists(path):
-        os.remove(path)
+OUTPUT_PATHS = {
+    "disorder": DISORDER_OUTPUT_JSON,
+    "phase": PHASESEP_OUTPUT_JSON,
+    "fold": FOLD_BINDING_OUTPUT_JSON,
+    "elm": ELM_OUTPUT_JSON,
+    "subclass1": SUBCLASS_POS1_JSON,
+    "subclass2": SUBCLASS_POS2_JSON,
+}
 
 def parse_region(region_str):
     regions = []
@@ -42,13 +45,13 @@ def parse_region(region_str):
                 start, end = map(int, part.split(".."))
                 regions.append((start, end))
             except ValueError:
-                continue  # Skip invalid regions
+                continue
         else:
             try:
                 pos = int(part)
                 regions.append((pos, pos))
             except ValueError:
-                continue  # Skip invalid regions
+                continue
     return regions
 
 def read_fasta_sequences(fasta_path):
@@ -67,6 +70,34 @@ def read_fasta_sequences(fasta_path):
         if acc:
             proteins[acc] = "".join(seq)
     return proteins
+
+def get_processed_accs():
+    """Read accession IDs from all output JSON files and return their intersection."""
+    all_accs = []
+    for output_path in OUTPUT_PATHS.values():
+        accs = set()
+        if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+            try:
+                with open(output_path, "r") as f:
+                    data = json.load(f)
+                    if not isinstance(data, list):
+                        print(f"Error: {output_path} does not contain a JSON list")
+                        continue
+                    for item in data:
+                        if not isinstance(item, dict) or len(item) != 1:
+                            print(f"Warning: Invalid item in {output_path}: {item}")
+                            continue
+                        acc = list(item.keys())[0]
+                        accs.add(acc)
+                    print(f"[DEBUG] Found {len(accs)} accession IDs in {output_path}")
+            except json.JSONDecodeError as e:
+                print(f"JSON decode error in {output_path}: {e}")
+            except Exception as e:
+                print(f"Error reading {output_path}: {e}")
+        all_accs.append(accs)
+    if not all_accs:
+        return set()
+    return set.intersection(*all_accs)
 
 def process_protein_all(acc, seq):
     try:
@@ -91,7 +122,7 @@ def process_protein_all(acc, seq):
 
             for start, end in parse_region(region_str):
                 if end > len(seq) or start < 1:
-                    continue  # Skip invalid regions
+                    continue
 
                 if feature in DISORDER_POS:
                     for i in range(start, end + 1):
@@ -120,84 +151,86 @@ def process_protein_all(acc, seq):
     except Exception as e:
         print(f"Error processing {acc}: {e}")
         return None
+    
+def writer_thread(output_path, queue):
+    # Load existing records to support resume
+    if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+        try:
+            with open(output_path, "r") as f:
+                existing_data = json.load(f)
+        except Exception:
+            existing_data = []
+    else:
+        existing_data = []
 
-def writer_thread(output_path, queue, done_flag):
-    buffer = {}
+    buffer = []
     counter = 0
 
-    # Initialize the file with an opening bracket for a JSON array
-    with open(output_path, "w") as f:
-        f.write("[\n")
-
-    while not done_flag["done"] or not queue.empty():
+    while True:
         try:
-            acc, labels = queue.get(timeout=1)
-            buffer[acc] = labels
+            item = queue.get(timeout=1)
+            if item is None:
+                break
+
+            acc, labels = item
+            buffer.append({acc: labels})
             counter += 1
 
-            # Write to file in chunks
-            if counter % WRITE_CHUNK_SIZE == 0:
-                with open(output_path, "a") as f:
-                    for i, (acc_key, lbl) in enumerate(buffer.items()):
-                        json.dump({acc_key: lbl}, f)
-                        if i < len(buffer) - 1 or not queue.empty() or not done_flag["done"]:
-                            f.write(",\n")
-                        else:
-                            f.write("\n")
-                    f.flush()
+            if len(buffer) >= WRITE_CHUNK_SIZE:
+                flush_buffer(buffer, existing_data, output_path)
                 buffer.clear()
 
-        except Empty:  # Correct exception
+        except Empty:
             time.sleep(0.1)
         except Exception as e:
             print(f"Error writing to {output_path}: {e}")
             time.sleep(0.1)
 
-    # Write remaining data
     if buffer:
-        with open(output_path, "a") as f:
-            for i, (acc_key, lbl) in enumerate(buffer.items()):
-                json.dump({acc_key: lbl}, f)
-                if i < len(buffer) - 1:
-                    f.write(",\n")
-                else:
-                    f.write("\n")
-            f.flush()
-
-    # Close the JSON array
-    with open(output_path, "a") as f:
-        f.write("]\n")
-        f.flush()
+        flush_buffer(buffer, existing_data, output_path)
 
     print(f"[✓] Written {counter} sequences to {output_path}")
 
-def build_label_data(protein_seqs):
-    print(f"[INFO] Starting label extraction for {len(protein_seqs)} proteins")
 
-    queues = {
-        "disorder": Queue(),
-        "phase": Queue(),
-        "fold": Queue(),
-        "elm": Queue(),
-        "subclass1": Queue(),
-        "subclass2": Queue()
-    }
-    done_flags = {key: {"done": False} for key in queues}
+def flush_buffer(buffer, existing_data, output_path):
+    existing_data.extend(buffer)
+    tmp_path = output_path + ".tmp"
+    with open(tmp_path, "w") as f:
+        json.dump(existing_data, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp_path, output_path)
+
+
+def build_label_data(protein_seqs):
+    # Get set of already processed accession IDs across all output files
+    processed_accs = get_processed_accs()
+    print(f"[INFO] Found {len(processed_accs)} already processed proteins")
+
+    # Filter unprocessed proteins
+    unprocessed_seqs = {acc: seq for acc, seq in protein_seqs.items() if acc not in processed_accs}
+    print(f"[INFO] Starting label extraction for {len(unprocessed_seqs)} unprocessed proteins")
+
+    if not unprocessed_seqs:
+        print("[INFO] No new proteins to process")
+        return
+
+    queues = {key: Queue() for key in OUTPUT_PATHS}
 
     threads = [
-        Thread(target=writer_thread, args=(DISORDER_OUTPUT_JSON, queues["disorder"], done_flags["disorder"])),
-        Thread(target=writer_thread, args=(PHASESEP_OUTPUT_JSON, queues["phase"], done_flags["phase"])),
-        Thread(target=writer_thread, args=(FOLD_BINDING_OUTPUT_JSON, queues["fold"], done_flags["fold"])),
-        Thread(target=writer_thread, args=(ELM_OUTPUT_JSON, queues["elm"], done_flags["elm"])),
-        Thread(target=writer_thread, args=(SUBCLASS_POS1_JSON, queues["subclass1"], done_flags["subclass1"])),
-        Thread(target=writer_thread, args=(SUBCLASS_POS2_JSON, queues["subclass2"], done_flags["subclass2"])),
+        Thread(target=writer_thread, args=(OUTPUT_PATHS["disorder"], queues["disorder"])),
+        Thread(target=writer_thread, args=(OUTPUT_PATHS["phase"], queues["phase"])),
+        Thread(target=writer_thread, args=(OUTPUT_PATHS["fold"], queues["fold"])),
+        Thread(target=writer_thread, args=(OUTPUT_PATHS["elm"], queues["elm"])),
+        Thread(target=writer_thread, args=(OUTPUT_PATHS["subclass1"], queues["subclass1"])),
+        Thread(target=writer_thread, args=(OUTPUT_PATHS["subclass2"], queues["subclass2"])),
     ]
 
     for t in threads:
         t.start()
 
     with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-        futures = [executor.submit(process_protein_all, acc, seq) for acc, seq in protein_seqs.items()]
+        futures = [executor.submit(process_protein_all, acc, seq) for acc, seq in unprocessed_seqs.items()]
         for future in tqdm(futures, desc="Processing proteins"):
             result = future.result()
             if result:
@@ -209,8 +242,9 @@ def build_label_data(protein_seqs):
                 queues["subclass1"].put((acc, s1))
                 queues["subclass2"].put((acc, s2))
 
-    for flag in done_flags.values():
-        flag["done"] = True
+    # Send sentinel values to all queues to stop writer threads
+    for queue in queues.values():
+        queue.put(None)
     for t in threads:
         t.join()
 
